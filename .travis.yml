@@ -9,5 +9,6 @@ script:
   - mypy iqtrade examples tests
   - flake8 iqtrade examples tests
   - black --diff --check iqtrade tests examples
+  - python -m build
 after_success:
   - codecov
