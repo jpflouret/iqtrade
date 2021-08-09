@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 from datetime import datetime, timedelta
 from typing import Any
 from unittest import mock
@@ -925,3 +926,29 @@ def test_get_candles(m: requests_mock.Mocker) -> None:
             start_time=datetime(2021, 1, 1),
             end_time=datetime(2021, 12, 31),
         )
+
+
+def test_notifications_streaming_port(m: requests_mock.Mocker) -> None:
+    TEST_PORT_RESULT1 = {"streamPort": random.randrange(1025, 32768)}
+    TEST_PORT_RESULT2 = {"streamPort": random.randrange(1025, 32768)}
+
+    m.get(REFRESH_TOKEN_URL + TEST_REFRESH_TOKEN_VALID, json=ACCESS_TOKEN_RESPONSE)
+    qt = iq.QuestradeIQ(TEST_VALID_CONFIG)
+
+    m.get(
+        TEST_MOCK_API_SERVER + "v1/notifications?mode=RawSocket",
+        json=TEST_PORT_RESULT1,
+        complete_qs=False,
+    )
+
+    m.get(
+        TEST_MOCK_API_SERVER + "v1/notifications?mode=WebSocket",
+        json=TEST_PORT_RESULT2,
+        complete_qs=False,
+    )
+
+    port1 = qt.get_notifications_streaming_port(iq.SocketMode.RawSocket)
+    assert port1 == TEST_PORT_RESULT1["streamPort"]
+
+    port2 = qt.get_notifications_streaming_port(iq.SocketMode.WebSocket)
+    assert port2 == TEST_PORT_RESULT2["streamPort"]

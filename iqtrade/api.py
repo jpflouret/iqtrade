@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import urllib.parse
 from datetime import datetime as dt
 from enum import Enum
 from typing import Any, Optional, Union
@@ -233,6 +234,11 @@ class StrategyType(Enum):
     IronButterfly = 14
     CondorCall = 15
     Custom = 16
+
+
+class SocketMode(Enum):
+    RawSocket = 0
+    WebSocket = 1
 
 
 class AccountInfo:
@@ -843,8 +849,27 @@ class QuestradeIQ:
         if "iq_refresh_token" not in self._config:
             raise ValueError("'iq_refresh_token' key not found in config")
 
+        self._api_server = ""
+        self._access_token = ""
+        self._token_type = ""
+        self._api_url: Optional[urllib.parse.ParseResult] = None
+
         self.session = requests.Session()
         self._get_access_token()
+
+    def get_api_server(self) -> str:
+        return self._api_server
+
+    def get_access_token(self) -> str:
+        return self._access_token
+
+    def get_access_token_type(self) -> str:
+        return self._token_type
+
+    def get_api_url(self) -> urllib.parse.ParseResult:
+        if self._api_url is not None:
+            return self._api_url
+        raise AttributeError("'api_url' is None")
 
     def _save_config(self) -> None:
         assert "iq_refresh_token" in self._config
@@ -884,6 +909,8 @@ class QuestradeIQ:
         self._api_server = access_token_data["api_server"]
         if self._api_server[-1] == "/":
             self._api_server = self._api_server[:-1]
+
+        self._api_url = urllib.parse.urlparse(self._api_server)
 
         if "token_type" in access_token_data:
             self._token_type = access_token_data["token_type"]
@@ -1336,3 +1363,10 @@ class QuestradeIQ:
         if "candles" not in response:
             raise RuntimeError("Invalid respose received")
         return [Candle(candle) for candle in response["candles"]]
+
+    def get_notifications_streaming_port(self, socket_mode: SocketMode) -> int:
+        query = {"stream": True, "mode": socket_mode.name}
+        response = self._make_request("notifications", params=query)
+        if "streamPort" not in response:
+            raise RuntimeError("Invalid respose received")
+        return int(response["streamPort"])
