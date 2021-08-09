@@ -1364,9 +1364,16 @@ class QuestradeIQ:
             raise RuntimeError("Invalid respose received")
         return [Candle(candle) for candle in response["candles"]]
 
-    def get_notifications_streaming_port(self, socket_mode: SocketMode) -> int:
-        query = {"stream": True, "mode": socket_mode.name}
+    def setup_streaming_notifications(self, socket_mode: SocketMode = SocketMode.WebSocket) -> int:
+        query = {"mode": socket_mode.name}
         response = self._make_request("notifications", params=query)
+        if "streamPort" not in response:
+            raise RuntimeError("Invalid respose received")
+        return int(response["streamPort"])
+
+    def setup_streaming_quotes(self, ids: list[int], socket_mode: SocketMode = SocketMode.WebSocket) -> int:
+        query = {"ids": ",".join([str(id) for id in ids]), "stream": "true", "mode": socket_mode.name}
+        response = self._make_request("markets/quotes", params=query)
         if "streamPort" not in response:
             raise RuntimeError("Invalid respose received")
         return int(response["streamPort"])

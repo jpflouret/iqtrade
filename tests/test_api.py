@@ -928,7 +928,7 @@ def test_get_candles(m: requests_mock.Mocker) -> None:
         )
 
 
-def test_notifications_streaming_port(m: requests_mock.Mocker) -> None:
+def test_notification_streaming(m: requests_mock.Mocker) -> None:
     TEST_PORT_RESULT1 = {"streamPort": random.randrange(1025, 32768)}
     TEST_PORT_RESULT2 = {"streamPort": random.randrange(1025, 32768)}
 
@@ -938,17 +938,43 @@ def test_notifications_streaming_port(m: requests_mock.Mocker) -> None:
     m.get(
         TEST_MOCK_API_SERVER + "v1/notifications?mode=RawSocket",
         json=TEST_PORT_RESULT1,
-        complete_qs=False,
+        complete_qs=True,
     )
 
     m.get(
         TEST_MOCK_API_SERVER + "v1/notifications?mode=WebSocket",
         json=TEST_PORT_RESULT2,
+        complete_qs=True,
+    )
+
+    port1 = qt.setup_streaming_notifications(iq.SocketMode.RawSocket)
+    assert port1 == TEST_PORT_RESULT1["streamPort"]
+
+    port2 = qt.setup_streaming_notifications(iq.SocketMode.WebSocket)
+    assert port2 == TEST_PORT_RESULT2["streamPort"]
+
+
+def test_quote_streaming(m: requests_mock.Mocker) -> None:
+    TEST_PORT_RESULT1 = {"streamPort": random.randrange(1025, 32768)}
+    TEST_PORT_RESULT2 = {"streamPort": random.randrange(1025, 32768)}
+
+    m.get(REFRESH_TOKEN_URL + TEST_REFRESH_TOKEN_VALID, json=ACCESS_TOKEN_RESPONSE)
+    qt = iq.QuestradeIQ(TEST_VALID_CONFIG)
+
+    m.get(
+        TEST_MOCK_API_SERVER + "v1/markets/quotes?ids=1234,5678&stream=true&mode=RawSocket",
+        json=TEST_PORT_RESULT1,
         complete_qs=False,
     )
 
-    port1 = qt.get_notifications_streaming_port(iq.SocketMode.RawSocket)
+    m.get(
+        TEST_MOCK_API_SERVER + "v1/markets/quotes?ids=8765,4321&stream=true&mode=WebSocket",
+        json=TEST_PORT_RESULT2,
+        complete_qs=False,
+    )
+
+    port1 = qt.setup_streaming_quotes([1234, 5678], iq.SocketMode.RawSocket)
     assert port1 == TEST_PORT_RESULT1["streamPort"]
 
-    port2 = qt.get_notifications_streaming_port(iq.SocketMode.WebSocket)
+    port2 = qt.setup_streaming_quotes([8765, 4321], iq.SocketMode.WebSocket)
     assert port2 == TEST_PORT_RESULT2["streamPort"]
