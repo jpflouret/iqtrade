@@ -1364,14 +1364,37 @@ class QuestradeIQ:
             raise RuntimeError("Invalid respose received")
         return [Candle(candle) for candle in response["candles"]]
 
-    def setup_streaming_notifications(self, socket_mode: SocketMode = SocketMode.WebSocket) -> int:
+    def setup_streaming_notifications(self, socket_mode: SocketMode) -> int:
+        """Retrieves the port number used for notification streaming.
+
+        Args:
+            socket_mode: Either RawSocket or WebSocket.
+
+        Returns:
+            The port number to connect to with ether raw or web sockets as requested.
+
+        See Also:
+            https://www.questrade.com/api/documentation/streaming
+        """
         query = {"mode": socket_mode.name}
         response = self._make_request("notifications", params=query)
         if "streamPort" not in response:
             raise RuntimeError("Invalid respose received")
         return int(response["streamPort"])
 
-    def setup_streaming_quotes(self, ids: list[int], socket_mode: SocketMode = SocketMode.WebSocket) -> int:
+    def setup_streaming_quotes(self, ids: list[int], socket_mode: SocketMode) -> int:
+        """Retrieves the port number used for L1 quote streaming.
+
+        Args:
+            ids: List of symbol ids to stream.
+            socket_mode: Either RawSocket or WebSocket.
+
+        Returns:
+            The port number to connect to with ether raw or web sockets as requested.
+
+        See Also:
+            https://www.questrade.com/api/documentation/streaming
+        """
         query = {"ids": ",".join([str(id) for id in ids]), "stream": "true", "mode": socket_mode.name}
         response = self._make_request("markets/quotes", params=query)
         if "streamPort" not in response:
