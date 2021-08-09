@@ -17,4 +17,4 @@ pip install qtrade
 ## Disclaimer
 
 This project is not affiliated with Questrade Wealth Management Inc., Questrade,
-Inc., or any members of the Questrade Group of Companiesor its affiliates.
+Inc., or any members of the Questrade Group of Companies or its affiliates.
