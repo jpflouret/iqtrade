@@ -12,7 +12,7 @@ jobs:
         python-version: 3.x
     - run: |
         pip install --upgrade pip
-        pip install black==21.7b0 flake8==3.9.2 mypy==v0.910
+        pip install black==21.7b0 flake8==3.9.2 mypy==v0.910 types-pytz types-requests typing-extensions
         black --diff --check iqtrade tests examples
         flake8 iqtrade tests examples
         mypy iqtrade tests examples
