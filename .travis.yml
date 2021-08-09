@@ -6,7 +6,8 @@ install:
 script:
   - pip install -e .
   - pytest --cov=iqtrade
-  - mypy iqtrade
-  - flake8 iqtrade
+  - mypy iqtrade examples tests
+  - flake8 iqtrade examples tests
+  - black --diff --check iqtrade tests examples
 after_success:
   - codecov
