@@ -1,0 +1,12 @@
+black>=21.7b0
+mypy>=0.910
+pre-commit>=2.14
+pytest>=6.2
+pytest-cov>=2.12
+pytz
+PyYAML>=5.4
+requests>=2.26.0
+requests-mock>=1.9.3
+types-pytz
+types-requests
+typing-extensions
