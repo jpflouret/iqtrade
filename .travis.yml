@@ -8,6 +8,6 @@ script:
   - pytest --cov=iqtrade
   - mypy iqtrade examples tests
   - flake8 iqtrade examples tests
-  - black --diff --check iqtrade tests example
+  - black --diff --check iqtrade tests examples
 after_success:
   - codecov
