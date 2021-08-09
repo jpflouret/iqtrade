@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.9"
+install:
+  - pip install -r requirements-dev.txt
+script:
+  - python setup.py install
+  - pytest --cov=iqtrade
+  - mypy iqtrade
+  - flake8 iqtrade
+after_success:
+  - codecov
