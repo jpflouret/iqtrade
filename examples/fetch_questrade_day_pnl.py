@@ -9,7 +9,7 @@ def print_accounts_pnl(qt: iq.QuestradeIQ) -> None:
 
     total_pnl = {iq.Currency.CAD: 0.0, iq.Currency.USD: 0.0}
     for account, positions in zip(accounts, account_positions):
-        print(account.number, account.type)
+        print(account.number, account.type.name)
         day_pnl = {iq.Currency.CAD: 0.0, iq.Currency.USD: 0.0}
         for position in sorted(positions):
             ticker = ticker_map[position.ticker]
