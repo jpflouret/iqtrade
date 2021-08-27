@@ -1,38 +1,48 @@
+image: python:latest
+
+variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+    paths:
+        - .cache/pip
+        - venv/
+
+before_script:
+    - python -V
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r requirements-dev.txt
+    - pip install -e .
+
 stages:
     - build
     - test
+    - publish
 
 build:
-    image: python:3.9
     stage: build
-    before_script:
-        - pip install -r requirements-dev.txt
     script:
         - python -m build
+    artifacts:
+        paths:
+            - dist/*
 
 test:
-    image: python:3.9
     stage: test
-    before_script:
-        - pip install -r requirements-dev.txt
-        - pip install -e .
+    needs: []
     script:
         - pytest --cov=iqtrade
-#        - codecov
-
-lint:
-    image: python:3.9
-    stage: test
-    before_script:
-        - pip install -r requirements-dev.txt
-    script:
         - mypy iqtrade examples tests
         - flake8 iqtrade examples tests
-
-style:
-    image: python:3.9
-    stage: test
-    before_script:
-        - pip install -r requirements-dev.txt
-    script:
         - black --diff --check iqtrade tests examples
+        - codecov
+
+publish:
+    stage: publish
+    needs: ["build"]
+    script:
+        - pip install twine
+        - python -m twine upload dist/*
+    when: manual
