@@ -813,8 +813,8 @@ class StrategyVariantQuote:
 
 class Candle:
     def __init__(self, iq_data: dict[str, Any]):
-        self.start: dt = iq_data["start"]
-        self.end: dt = iq_data["end"]
+        self.start: str = iq_data["start"]
+        self.end: str = iq_data["end"]
         self.open: float = iq_data["open"]
         self.high: float = iq_data["high"]
         self.low: float = iq_data["low"]
@@ -1327,8 +1327,13 @@ class QuestradeIQ:
         return [StrategyVariantQuote(quote) for quote in response["strategyQuotes"]]
 
     def get_candles(
-        self, ticker: Union[str, Ticker, TickerDetails, int], interval: Granularity, start_time: dt, end_time: dt
-    ) -> list[Candle]:
+        self,
+        ticker: Union[str, Ticker, TickerDetails, int],
+        interval: Granularity,
+        start_time: dt,
+        end_time: dt,
+        raw_data: bool = False,
+    ) -> Union[list[Candle], dict[str, Any]]:
         """Retrieves historical market data in the form of OHLC candlesticks for a specified symbol.
 
             This call is limited to returning 2,000 candlesticks in a single response.
@@ -1362,7 +1367,7 @@ class QuestradeIQ:
         response = self._make_request(f"markets/candles/{id}", params=query)
         if "candles" not in response:
             raise RuntimeError("Invalid respose received")
-        return [Candle(candle) for candle in response["candles"]]
+        return response["candles"] if raw_data else [Candle(candle) for candle in response["candles"]]
 
     def setup_streaming_notifications(self, socket_mode: SocketMode) -> int:
         """Retrieves the port number used for notification streaming.
