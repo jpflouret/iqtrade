@@ -420,6 +420,7 @@ TEST_CANDLES_RESPONSE = {
             "open": 70.68,
             "close": 70.73,
             "volume": 983609,
+            "VWAP": 70.67,
         },
     ]
 }
@@ -486,6 +487,24 @@ def test_config_dict_valid_token_inv_response(m: requests_mock.Mocker) -> None:
     with pytest.raises(RuntimeError):
         iq.QuestradeIQ(TEST_VALID_CONFIG)
     assert m.call_count == 1
+
+
+def test_login(m: requests_mock.Mocker) -> None:
+    m.get(REFRESH_TOKEN_URL + TEST_REFRESH_TOKEN_VALID, json=ACCESS_TOKEN_RESPONSE)
+    qt = iq.QuestradeIQ(TEST_VALID_CONFIG)
+    assert qt.get_access_token() == ACCESS_TOKEN_RESPONSE["access_token"]
+    assert qt.get_access_token_type() == ACCESS_TOKEN_RESPONSE["token_type"]
+
+    api_server = ACCESS_TOKEN_RESPONSE["api_server"]
+    if api_server[-1] == "/":
+        api_server = api_server[:-1]
+
+    assert qt.get_api_server() == api_server
+
+    url = qt.get_api_url()
+    assert url.scheme == "https"
+    assert url.path == ""
+    assert url.hostname == "api01.iq.questrade.com"
 
 
 def test_get_time(m: requests_mock.Mocker) -> None:
@@ -667,6 +686,7 @@ def test_get_accounts(m: requests_mock.Mocker) -> None:
     assert result[0].number == TEST_ACCOUNTS_RESPONSE["accounts"][0]["number"]
     assert result[0].status == TEST_ACCOUNTS_RESPONSE["accounts"][0]["status"]
     assert not (result[0] < result[0])
+    assert iq.AccountInfo.get_account_number(result[0]) == TEST_ACCOUNTS_RESPONSE["accounts"][0]["number"]
 
     m.get(TEST_MOCK_API_SERVER + "v1/accounts", json={})
     with pytest.raises(RuntimeError):
@@ -978,3 +998,17 @@ def test_quote_streaming(m: requests_mock.Mocker) -> None:
 
     port2 = qt.setup_streaming_quotes([8765, 4321], iq.SocketMode.WebSocket)
     assert port2 == TEST_PORT_RESULT2["streamPort"]
+
+
+def test_account_types(m: requests_mock.Mocker) -> None:
+    assert iq.ClientAccountType.Individual == iq.ClientAccountType.from_string("Individual")
+    assert iq.ClientAccountType.Joint == iq.ClientAccountType.from_string("Joint")
+    assert iq.ClientAccountType.InformalTrust == iq.ClientAccountType.from_string("Informal Trust")
+    assert iq.ClientAccountType.Corporation == iq.ClientAccountType.from_string("Corporation")
+    assert iq.ClientAccountType.InvestmentClub == iq.ClientAccountType.from_string("Investment Club")
+    assert iq.ClientAccountType.FormalTrust == iq.ClientAccountType.from_string("Formal Trust")
+    assert iq.ClientAccountType.Partnership == iq.ClientAccountType.from_string("Partnership")
+    assert iq.ClientAccountType.SoleProprietorship == iq.ClientAccountType.from_string("Sole Proprietorship")
+    assert iq.ClientAccountType.Family == iq.ClientAccountType.from_string("Family")
+    assert iq.ClientAccountType.JointAndInformalTrust == iq.ClientAccountType.from_string("Joint and Informal Trust")
+    assert iq.ClientAccountType.Institution == iq.ClientAccountType.from_string("Institution")

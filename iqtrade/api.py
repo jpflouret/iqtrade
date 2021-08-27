@@ -85,7 +85,7 @@ class ClientAccountType(Enum):
         elif account_type == "Institution":
             return ClientAccountType.Institution
         else:
-            raise ValueError("account_type")
+            raise ValueError("account_type")  # pragma: no cover
 
 
 class TickType(Enum):
@@ -265,7 +265,7 @@ class AccountInfo:
         elif isinstance(account_id, AccountInfo):
             return account_id.number
         else:
-            raise TypeError("Invalid type for 'account_id'")
+            raise TypeError("Invalid type for 'account_id'")  # pragma: no cover
 
 
 class AccountActivity:
@@ -869,7 +869,7 @@ class QuestradeIQ:
     def get_api_url(self) -> urllib.parse.ParseResult:
         if self._api_url is not None:
             return self._api_url
-        raise AttributeError("'api_url' is None")
+        raise AttributeError("'api_url' is None")  # pragma: no cover
 
     def _save_config(self) -> None:
         assert "iq_refresh_token" in self._config
@@ -1057,7 +1057,7 @@ class QuestradeIQ:
             query["endTime"] = end_time.isoformat()
         if state_filter:
             if not isinstance(state_filter, OrderStateFilter):
-                raise TypeError("Type of 'state_filter' must be OrderStateFilter")
+                raise TypeError("Type of 'state_filter' must be OrderStateFilter")  # pragma: no cover
             query["stateFilter"] = state_filter.name
         response = self._make_request(f"accounts/{AccountInfo.get_account_number(account_id)}/orders", params=query)
         if "orders" not in response:
@@ -1366,7 +1366,7 @@ class QuestradeIQ:
         }
         response = self._make_request(f"markets/candles/{id}", params=query)
         if "candles" not in response:
-            raise RuntimeError("Invalid respose received")
+            raise RuntimeError("Invalid respose received")  # pragma: no cover
         return response["candles"] if raw_data else [Candle(candle) for candle in response["candles"]]
 
     def setup_streaming_notifications(self, socket_mode: SocketMode) -> int:
@@ -1384,7 +1384,7 @@ class QuestradeIQ:
         query = {"mode": socket_mode.name}
         response = self._make_request("notifications", params=query)
         if "streamPort" not in response:
-            raise RuntimeError("Invalid respose received")
+            raise RuntimeError("Invalid respose received")  # pragma: no cover
         return int(response["streamPort"])
 
     def setup_streaming_quotes(self, ids: list[int], socket_mode: SocketMode) -> int:
@@ -1403,5 +1403,5 @@ class QuestradeIQ:
         query = {"ids": ",".join([str(id) for id in ids]), "stream": "true", "mode": socket_mode.name}
         response = self._make_request("markets/quotes", params=query)
         if "streamPort" not in response:
-            raise RuntimeError("Invalid respose received")
+            raise RuntimeError("Invalid respose received")  # pragma: no cover
         return int(response["streamPort"])
