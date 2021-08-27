@@ -11,7 +11,7 @@ Python wrapper around Questrade [IQ API](https://www.questrade.com/api/documenta
 Install via pip
 
 ```
-pip install qtrade
+pip install iqtrade
 ```
 
 ## Disclaimer
