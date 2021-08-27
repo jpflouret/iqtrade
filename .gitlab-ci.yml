@@ -27,7 +27,7 @@ build:
         - python -m build
     artifacts:
         paths:
-            - dist/*
+            - dist/*.whl
 
 test:
     stage: test
@@ -41,6 +41,8 @@ test:
 
 publish:
     stage: publish
+    only:
+        - tags
     needs: ["build"]
     script:
         - pip install twine
