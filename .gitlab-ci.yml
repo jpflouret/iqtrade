@@ -1,0 +1,38 @@
+stages:
+    - build
+    - test
+
+build:
+    image: python:3.9
+    stage: build
+    before_script:
+        - pip install -r requirements-dev.txt
+    script:
+        - python -m build
+
+test:
+    image: python:3.9
+    stage: test
+    before_script:
+        - pip install -r requirements-dev.txt
+        - pip install -e .
+    script:
+        - pytest --cov=iqtrade
+#        - codecov
+
+lint:
+    image: python:3.9
+    stage: test
+    before_script:
+        - pip install -r requirements-dev.txt
+    script:
+        - mypy iqtrade examples tests
+        - flake8 iqtrade examples tests
+
+style:
+    image: python:3.9
+    stage: test
+    before_script:
+        - pip install -r requirements-dev.txt
+    script:
+        - black --diff --check iqtrade tests examples
