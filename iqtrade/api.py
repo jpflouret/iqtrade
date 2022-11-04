@@ -286,7 +286,7 @@ class AccountActivity:
         self.activity_type: str = iq_data["type"]
 
     def __str__(self) -> str:  # pragma: no cover
-        return (
+        return str(
             self.activity_type
             + " "
             + self.action
@@ -443,7 +443,7 @@ class TickerDetails:
     def get_display_name(self) -> str:  # pragma: no cover
         if isinstance(self.option_expiry_date, dt):
             if self.option_root:
-                return (
+                return str(
                     self.option_root
                     + " "
                     + self.option_expiry_date.strftime("%d %b %Y")
@@ -553,7 +553,7 @@ class Order:
             price = f"{self.limit_price:,.2f} LimitOnOpen"
         elif self.order_type == OrderType.LimitOnClose:
             price = f"{self.limit_price:,.2f} LimitOnClose"
-        return (
+        return str(
             self.side.name
             + " "
             + str(self.total_quantity)
