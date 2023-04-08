@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="iqtrade",
-    version="0.0.4",
+    version="0.0.5",
     author="JP Flouret",
     author_email="jpflouret@gmail.com",
     description="Python wrapper around Questrade IQ API",
