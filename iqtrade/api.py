@@ -62,30 +62,31 @@ class ClientAccountType(Enum):
 
     @staticmethod
     def from_string(account_type: str) -> ClientAccountType:
-        if account_type == "Individual":
+        account_type = account_type.replace(" ", "").lower()
+        if account_type == "individual":
             return ClientAccountType.Individual
-        elif account_type == "Joint":
+        elif account_type == "joint":
             return ClientAccountType.Joint
-        elif account_type == "Informal Trust":
+        elif account_type == "informaltrust":
             return ClientAccountType.InformalTrust
-        elif account_type == "Corporation":
+        elif account_type == "corporation":
             return ClientAccountType.Corporation
-        elif account_type == "Investment Club":
+        elif account_type == "investmentclub":
             return ClientAccountType.InvestmentClub
-        elif account_type == "Formal Trust":
+        elif account_type == "formaltrust":
             return ClientAccountType.FormalTrust
-        elif account_type == "Partnership":
+        elif account_type == "partnership":
             return ClientAccountType.Partnership
-        elif account_type == "Sole Proprietorship":
+        elif account_type == "soleproprietorship":
             return ClientAccountType.SoleProprietorship
-        elif account_type == "Family":
+        elif account_type == "family":
             return ClientAccountType.Family
-        elif account_type == "Joint and Informal Trust":
+        elif account_type == "jointandinformaltrust":
             return ClientAccountType.JointAndInformalTrust
-        elif account_type == "Institution":
+        elif account_type == "institution":
             return ClientAccountType.Institution
         else:
-            raise ValueError("account_type")  # pragma: no cover
+            raise ValueError('Unknown account_type "' + account_type + '"')  # pragma: no cover
 
 
 class TickType(Enum):
@@ -826,7 +827,7 @@ class Candle:
 
 
 class QuestradeIQ:
-    def __init__(self, config: Union[str, dict[str, Any]] = "secrets.json", safe_config: bool = True):
+    def __init__(self, config: Union[str, dict[str, Any]] = "secrets.json", save_config: bool = True):
         """Constructor
 
         Parameters
@@ -835,7 +836,7 @@ class QuestradeIQ:
             Config filename or dictionary.
                 If a dict, key/value pairs for configuration, by default "secrets.json"
         """
-        self._should_save_config = safe_config
+        self._should_save_config = save_config
         if isinstance(config, str):
             self._config_filename = config
             with open(self._config_filename, "r") as infile:

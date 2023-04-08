@@ -456,7 +456,7 @@ def test_config_file_open(om: mock.MagicMock, m: requests_mock.Mocker) -> None:
 def test_config_file_open_but_not_saved(om: mock.MagicMock, m: requests_mock.Mocker) -> None:
     filename = "mysettings.json"
     m.get(REFRESH_TOKEN_URL + TEST_REFRESH_TOKEN_VALID, json=ACCESS_TOKEN_RESPONSE)
-    iq.QuestradeIQ(filename, safe_config=False)
+    iq.QuestradeIQ(filename, save_config=False)
     om.assert_called_once_with(filename, "r")
     assert len(m.request_history) == 1
 
