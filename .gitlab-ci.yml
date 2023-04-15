@@ -37,7 +37,6 @@ test:
         - mypy iqtrade examples tests
         - flake8 iqtrade examples tests
         - black --diff --check iqtrade tests examples
-        - codecov
 
 publish:
     stage: publish

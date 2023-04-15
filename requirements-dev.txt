@@ -1,6 +1,5 @@
 black>=23.3.0
 build
-codecov>=2.1.12
 flake8>=3.9.2
 mypy>=0.910
 pre-commit>=2.14
