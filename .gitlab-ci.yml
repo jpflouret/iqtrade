@@ -3,10 +3,13 @@ image: python:latest
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
-cache:
-    paths:
-        - .cache/pip
-        - venv/
+default:
+    cache: &global_cache
+        key: $CI_COMMIT_REF_SLUG
+        policy: pull-push
+        paths:
+            - .cache/pip
+            - venv/
 
 before_script:
     - python -V
@@ -30,6 +33,9 @@ build:
             - dist/*.whl
 
 test:
+    cache:
+        <<: *global_cache
+        policy: pull
     stage: test
     needs: []
     script:
@@ -39,11 +45,13 @@ test:
         - black --diff --check iqtrade tests examples
 
 publish:
+    cache:
+        <<: *global_cache
+        policy: pull
     stage: publish
     only:
         - tags
     needs: ["build"]
     script:
-        - pip install twine
         - python -m twine upload dist/*
     when: manual
